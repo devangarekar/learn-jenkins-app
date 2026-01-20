@@ -3,9 +3,6 @@ pipeline {
 
     stages {
 
-        /* =====================
-           BUILD STAGE
-        ====================== */
         stage('Build') {
             agent {
                 docker {
@@ -24,9 +21,6 @@ pipeline {
             }
         }
 
-        /* =====================
-           TEST STAGE
-        ====================== */
         stage('Test') {
             agent {
                 docker {
@@ -44,28 +38,30 @@ pipeline {
         }
 
         stage('Deploy') {
-    agent {
-        docker {
-            image 'node:18-alpine'
-            reuseNode true
-        }
-    }
-    steps {
-        withCredentials([
-            string(credentialsId: 'netlify-token', variable: 'NETLIFY_AUTH_TOKEN'),
-            string(credentialsId: 'netlify-site-id', variable: 'NETLIFY_SITE_ID')
-        ]) {
-            sh '''
-                echo "=== Deploy Stage ==="
-                npm install netlify-cli@20.1.1
+            agent {
+                docker {
+                    image 'node:18-alpine'
+                    reuseNode true
+                }
+            }
+            steps {
+                withCredentials([
+                    string(credentialsId: 'netlify-token', variable: 'NETLIFY_AUTH_TOKEN'),
+                    string(credentialsId: 'netlify-site-id', variable: 'NETLIFY_SITE_ID')
+                ]) {
+                    sh '''
+                        echo "=== Deploy Stage ==="
+                        npm install netlify-cli@20.1.1
 
-                node_modules/.bin/netlify deploy \
-                  --prod \
-                  --dir=build \
-                  --site=$NETLIFY_SITE_ID \
-                  --auth=$NETLIFY_AUTH_TOKEN
-            '''
+                        node_modules/.bin/netlify deploy \
+                          --prod \
+                          --dir=build \
+                          --site=$NETLIFY_SITE_ID \
+                          --auth=$NETLIFY_AUTH_TOKEN
+                    '''
+                }
+            }
         }
+
     }
 }
-
