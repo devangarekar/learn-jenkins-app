@@ -47,24 +47,30 @@ pipeline {
            DEPLOY STAGE (NETLIFY)
         ====================== */
         stage('Deploy') {
-            agent {
-                docker {
-                    image 'node:18-alpine'
-                    reuseNode true
-                }
-            }
-            environment {
-                NETLIFY_AUTH_TOKEN = credentials('nfp_tAaMoidfLsHEAXQ3RJCeCdQJFTa3xXVN72bc')
-                NETLIFY_SITE_ID    = credentials('netlify-token')
-            }
-            steps {
-                sh '''
-                    echo "=== Deploy Stage ==="
-                    npm install netlify-cli@20.1.1
-                    node_modules/.bin/netlify deploy --prod --dir=build
-                '''
-            }
+    agent {
+        docker {
+            image 'node:18-alpine'
+            reuseNode true
         }
+    }
+    environment {
+        NETLIFY_AUTH_TOKEN = credentials('netlify-token')
+        NETLIFY_SITE_ID    = credentials('netlify-site-id')
+    }
+    steps {
+        sh '''
+            echo "=== Deploy Stage ==="
+            npm install netlify-cli@20.1.1
+
+            node_modules/.bin/netlify deploy \
+              --prod \
+              --dir=build \
+              --site=$NETLIFY_SITE_ID \
+              --auth=$NETLIFY_AUTH_TOKEN
+        '''
+    }
+}
+
     }
 }
 
