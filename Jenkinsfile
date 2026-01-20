@@ -55,7 +55,7 @@ pipeline {
             }
             environment {
                 NETLIFY_AUTH_TOKEN = credentials('nfp_tAaMoidfLsHEAXQ3RJCeCdQJFTa3xXVN72bc')
-                NETLIFY_SITE_ID    = credentials('5e2ae1b4-1177-4829-9ae2-5222dc9091c3')
+                NETLIFY_SITE_ID    = credentials('netlify-token')
             }
             steps {
                 sh '''
