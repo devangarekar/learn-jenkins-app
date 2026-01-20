@@ -46,7 +46,7 @@ pipeline {
             }
             steps {
                 withCredentials([
-                    string(credentialsId: 'netlify-token', variable: 'NETLIFY_AUTH_TOKEN'),
+                    string(credentialsId: 'nfp_6ec93EeYWHyz7svsTxqJT8rBLUrrVLKA1383', variable: 'NETLIFY_AUTH_TOKEN'),
                     string(credentialsId: 'netlify-site-id', variable: 'NETLIFY_SITE_ID')
                 ]) {
                     sh '''
