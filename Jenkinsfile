@@ -7,6 +7,7 @@ pipeline {
             agent {
                 docker {
                     image 'node:18-alpine'
+                    reuseNode true
                 }
             }
             steps {
@@ -24,6 +25,7 @@ pipeline {
             agent {
                 docker {
                     image 'node:18-alpine'
+                    reuseNode true
                 }
             }
             steps {
@@ -36,25 +38,36 @@ pipeline {
         }
 
         stage('Deploy') {
-    agent {
-        docker {
-            image 'node:18'
-            reuseNode true
+            agent {
+                docker {
+                    image 'node:18'
+                    reuseNode true
+                }
+            }
+            steps {
+                withCredentials([
+                    string(credentialsId: 'netlifytoken', variable: 'NETLIFY_AUTH_TOKEN'),
+                    string(credentialsId: 'netlifysite', variable: 'NETLIFY_SITE_ID')
+                ]) {
+                    sh '''
+                        echo "=== Deploy Stage ==="
+                        npx netlify deploy \
+                          --prod \
+                          --dir=build \
+                          --site=$NETLIFY_SITE_ID \
+                          --auth=$NETLIFY_AUTH_TOKEN
+                    '''
+                }
+            }
         }
     }
-    steps {
-        withCredentials([
-            string(credentialsId: 'netlifytoken', variable: 'NETLIFY_AUTH_TOKEN'),
-            string(credentialsId: 'netlifysite', variable: 'NETLIFY_SITE_ID')
-        ]) {
-            sh '''
-                echo "=== Deploy Stage ==="
-                npx netlify deploy \
-                  --prod \
-                  --dir=build \
-                  --site=$NETLIFY_SITE_ID \
-                  --auth=$NETLIFY_AUTH_TOKEN
-            '''
+
+    post {
+        success {
+            echo "✅ Pipeline completed successfully"
+        }
+        failure {
+            echo "❌ Pipeline failed"
         }
     }
 }
