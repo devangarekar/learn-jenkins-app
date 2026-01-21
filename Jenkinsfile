@@ -36,37 +36,25 @@ pipeline {
         }
 
         stage('Deploy') {
-            agent {
-                docker {
-                    image 'node:18-alpine'
-                }
-            }
-            steps {
-                withCredentials([
-                    string(credentialsId: 'netlifytoken', variable: 'NETLIFY_AUTH_TOKEN'),
-                    string(credentialsId: 'netlifysite', variable: 'NETLIFY_SITE_ID')
-                ]) {
-                    sh '''
-                        echo "=== Deploy Stage ==="
-                        npm install netlify-cli@20.1.1
-
-                        node_modules/.bin/netlify deploy \
-                          --prod \
-                          --dir=build \
-                          --site=$NETLIFY_SITE_ID \
-                          --auth=$NETLIFY_AUTH_TOKEN
-                    '''
-                }
-            }
+    agent {
+        docker {
+            image 'node:18'
+            reuseNode true
         }
     }
-
-    post {
-        success {
-            echo "✅ Pipeline completed successfully"
-        }
-        failure {
-            echo "❌ Pipeline failed"
+    steps {
+        withCredentials([
+            string(credentialsId: 'netlifytoken', variable: 'NETLIFY_AUTH_TOKEN'),
+            string(credentialsId: 'netlifysite', variable: 'NETLIFY_SITE_ID')
+        ]) {
+            sh '''
+                echo "=== Deploy Stage ==="
+                npx netlify deploy \
+                  --prod \
+                  --dir=build \
+                  --site=$NETLIFY_SITE_ID \
+                  --auth=$NETLIFY_AUTH_TOKEN
+            '''
         }
     }
 }
