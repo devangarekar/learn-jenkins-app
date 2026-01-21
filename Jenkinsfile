@@ -42,9 +42,11 @@ pipeline {
                 }
             }
             steps {
-                withCredentials([
-                    string(credentialsId: 'netlify-token', variable: 'NETLIFY_AUTH_TOKEN'),
-                    string(credentialsId: 'netlify-site-id', variable: 'NETLIFY_SITE_ID')
+               withCredentials([
+                 string(credentialsId: 'netlifytoken', variable: 'NETLIFY_AUTH_TOKEN'),
+                 string(credentialsId: 'netlifysite', variable: 'NETLIFY_SITE_ID')
+                ])
+
                 ]) {
                     sh '''
                         echo "=== Deploy Stage ==="
